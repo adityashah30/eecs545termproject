@@ -4,7 +4,6 @@ class GA:
     '''
     The Genetic Algorithm (GA) class. Encodes the following information.
     1. The population
-    2. 
     '''
 
     def __init__(self, gen_count=100, size=100, elitism=0.15, mutation=0.3):
