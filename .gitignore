@@ -1,5 +1,6 @@
 data
 *.o
+*.pyc
 *.out
 *.png
 *.pdf
