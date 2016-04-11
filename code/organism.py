@@ -3,7 +3,7 @@ import numpy as np
 from glob import glob
 
 def loadData():
-    fileList = glob('../data/nasa/pc5.csv')
+    fileList = glob('../data/use_greedy_1/*.csv')
     data = np.concatenate([np.loadtxt(f, dtype='str', delimiter=',', skiprows=1) for f in fileList])
     X_data = data[:, :-2].astype('float32')
     Y_data = data[:, -1].astype('int8')
@@ -18,7 +18,8 @@ class Organism:
                  nodes in the hidden layer.
     '''
 
-<<<<<<< HEAD
+    data = loadData()
+
     def __init__(self, count,feature_subset=[], hidden_nodes=None):
     	data = loadData()
         self.feature_subset = feature_subset
@@ -35,10 +36,8 @@ class Organism:
         feature = np.random.randint(0,self.count)
         if feature in self.feature_subset:
             feature = np.random.randint(0,self.count)
-        else
+        else:
             self.feature_subset[index] = feature
-
-        pass
 
     def reproduce(self, other):
         subsetsize1 = len(self.feature_subset)
@@ -50,7 +49,6 @@ class Organism:
         childcount = len(childfeatures)
         child = Organism(childcount,childfeatures)
         return child
-        #pass
 
     def fitness_measure(self):
         classifier = Classifier(self.hidden_nodes)
@@ -61,5 +59,5 @@ class Organism:
     def init_random(subsetsize):
         count = 40 #num of features
         features = np.random.randint(0,count,size = subsetsize)
-        Org = Organism(count,features)
+        return Organism(count,features)
 
