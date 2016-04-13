@@ -1,4 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr 12 21:27:18 2016
+
+@author: SHARATH NS
+"""
+
 from organism import Organism
+import random
 
 class Population:
     '''
@@ -13,44 +21,50 @@ class Population:
         self.pop_size = size
         self.elitism = elitism
         self.mutation = mutation
-        self.population = [Organism.init_random() for _ in xrange(size)]
+        self.population = [Organism.init_random(15) for _ in range(size)]
+  
+    def weighted_choice(self,items):
+ 
+        weight_total = sum((item[1] for item in items))
+        n = random.uniform(0, weight_total)
+        for item, weight in items:
+          if n < weight:
+            return item
+            n = n - weight
+        return item
 
     def create_next_gen(self):
-	 for organism in population:
-       fitness_val = fitness(individual)
+        new_gen=Population();
+        weighted_population=[]
+        
+        for Org in self.population:
+            fitness_val = Org.fitness_measure()
+            if fitness_val == 0:
+                pair = (Org, 1.0)
+            else:
+                pair = (Org, 1.0/fitness_val)
+            weighted_population.append(pair)
+        
+        new_population = [];
+        for _ in range(self.pop_size):
+            ind1 = self.weighted_choice(weighted_population)
+            ind2 = self.weighted_choice(weighted_population)
+            child = ind1.reproduce(ind2)
+            new_population.append(child.mutate)
+        
+        new_gen.pop_size=self.pop_size
+        new_gen.elitism=self.elitism
+        new_gen.mutation=self.mutation
+        new_gen.new_population=new_population
+        return new_gen
+        
+         
+    
 
-      # Generate the (individual,fitness) pair, taking in account whether or
-      # not we will accidently divide by zero.
-      if fitness_val == 0:
-        pair = (individual, 1.0)
-      else:
-        pair = (individual, 1.0/fitness_val)
-
-      weighted_population.append(pair)
-
-    population = []
-
-    # Select two random individuals, based on their fitness probabilites, cross
-    # their genes over at a random point, mutate them, and add them back to the
-    # population for the next iteration.
-    for _ in xrange(POP_SIZE/2):
-      # Selection
-      ind1 = weighted_choice(weighted_population)
-      ind2 = weighted_choice(weighted_population)
-
-      # Crossover
-      ind1, ind2 = crossover(ind1, ind2)
-
-      # Mutate and add back into the population.
-      population.append(mutate(ind1))
-      population.append(mutate(ind2))
-
-  # Display the highest-ranked string after all generations have been iterated
-  # over. This will be the closest string to the OPTIMAL string, meaning it
-  # will have the smallest fitness value. Finally, exit the program.
-  fittest_string = population[0]
-  minimum_fitness = fitness(population[0])
-		
-	   
-	   
-		
+            
+    
+                
+                
+            
+        
+   
