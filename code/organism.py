@@ -4,10 +4,11 @@ from glob import glob
 
 
 def loadData():
-    fileList = glob('eclipseJDT.csv')
-    data = np.concatenate([np.loadtxt('eclipseJDT.csv', delimiter=',', skiprows=1) for f in fileList])
-    X_data = data[:, :-2].astype('float32')
+    fileList = glob('../data/use_greedy_1/*.csv')
+    data = np.concatenate([np.loadtxt(f, delimiter=',', skiprows=1) for f in fileList])
+    X_data = data[:, :-1].astype('float32')
     Y_data = data[:, -1].astype('int8')
+    Y_data[Y_data > 0] = 1
     dataDict = {'X': X_data, 'Y': Y_data}
     return dataDict
 
@@ -52,11 +53,11 @@ class Organism:
     def fitness_measure(self):
         classifier = Classifier(self.hidden_nodes)
         #0:loss, 1:accuracy
-        return classifier.fit_score(Organism.data, self.feature_subset)[1]
+        return classifier.fit_score(Organism.data, self.feature_subset)
 
     @staticmethod
     def init_random(subsetsize):
-        hiddennodes = np.random.randint(1,subsetsize-1)
-        features = np.random.randint(0,Organism.count,size=subsetsize)
+        hiddennodes = [np.random.randint(1,Organism.count)]
+        features = np.random.randint(0,Organism.count-1,size=subsetsize)
         return Organism(features,hiddennodes)
 

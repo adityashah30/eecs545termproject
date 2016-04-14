@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Tue Apr 12 21:27:18 2016
 
@@ -57,14 +56,3 @@ class Population:
         new_gen.mutation=self.mutation
         new_gen.new_population=new_population
         return new_gen
-        
-         
-    
-
-            
-    
-                
-                
-            
-        
-   

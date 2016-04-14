@@ -1,5 +1,6 @@
 from sklearn.preprocessing import StandardScaler
 from sklearn.cross_validation import train_test_split
+from sklearn.metrics import roc_auc_score
 from keras.models import Sequential
 from keras.utils import np_utils
 from keras.layers import Dense, Dropout, Activation
@@ -20,7 +21,7 @@ class Classifier:
         self.nb_epoch = 10
 
     def fit_score(self, data, feature_set):
-        X, Y = data['X'][feature_set], data['Y']
+        X, Y = data['X'][:,feature_set], data['Y']
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=self.seed)
         X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, test_size=0.125, random_state=self.seed)
 
@@ -32,10 +33,10 @@ class Classifier:
         Y_val = np_utils.to_categorical(Y_val, self.nb_classes)
         Y_test = np_utils.to_categorical(Y_test, self.nb_classes)
 
-        nb_features = X_train.shape[0]
+        nb_features = X_train.shape[1]
 
         model = Sequential()
-        model.add(Dense(hidden_net[0], input_shape=(nb_features,)))
+        model.add(Dense(self.hidden_net[0], input_shape=(nb_features,)))
         model.add(Dropout(0.15))
         model.add(Activation('relu'))
 
@@ -44,16 +45,15 @@ class Classifier:
             model.add(Dropout(0.15))
             model.add(Activation('relu'))
 
-        model.add(Dense(self.nb_classes))
-        model.add(Activation('signmoid'))
+        model.add(Dense(1))
+        model.add(Activation('sigmoid'))
 
-        model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+        model.compile(class_mode='binary', loss='binary_crossentropy', optimizer='rmsprop')
 
-        model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=1, validation_data=(X_val, Y_val))
+        model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=0, validation_data=(X_val, Y_val))
 
-        return model.evaluate(X_test, Y_test, batch_size=self.batch_size)
-
-
-
-
-
+        # test_score = model.evaluate(X_test, Y_test, verbose=0, batch_size=self.batch_size)
+        Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=0)
+        test_score = roc_auc_score(Y_test, Y_pred)
+        print test_score
+        return test_score

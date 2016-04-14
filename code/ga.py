@@ -6,11 +6,12 @@ class GA:
     1. The population
     '''
 
-    def __init__(self, gen_count=100, size=100, elitism=0.15, mutation=0.3):
+    def __init__(self, gen_count=10, size=10, elitism=0.15, mutation=0.3):
         self.gen_count = gen_count
         self.population = Population(size, elitism, mutation)
 
     def search(self):
-        for _ in xrange(self.gen_count):
+        for genIter in xrange(self.gen_count):
+            print "In generation: ", genIter
             self.population = self.population.create_next_gen()
         return self.population.population
