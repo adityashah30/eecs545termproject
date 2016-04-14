@@ -26,17 +26,14 @@ class Organism:
     def __init__(self, feature_subset=[], hidden_nodes=None):
         data = loadData()
         self.feature_subset = feature_subset
-        if hidden_nodes:
-            self.hidden_nodes = hidden_nodes
-            self.use_neural_net = True
-        else:
-            self.use_neural_net = False
+        self.hidden_nodes = hidden_nodes
+        self.fitness = self.fitness_measure()
 
     def mutate(self):
         subsetsize = len(self.feature_subset)
         index = np.random.randint(0,subsetsize)
         feature = np.random.randint(0,Organism.count)
-        while(feature in self.feature_subset):
+        while feature in self.feature_subset:
             feature = np.random.randint(0,Organism.count)
         self.feature_subset[index] = feature
 
@@ -52,12 +49,11 @@ class Organism:
 
     def fitness_measure(self):
         classifier = Classifier(self.hidden_nodes)
-        #0:loss, 1:accuracy
         return classifier.fit_score(Organism.data, self.feature_subset)
 
     @staticmethod
     def init_random(subsetsize):
-        hiddennodes = [np.random.randint(1,Organism.count)]
+        hiddennodes = np.random.randint(1,Organism.count)
         features = np.random.randint(0,Organism.count-1,size=subsetsize)
         return Organism(features,hiddennodes)
 

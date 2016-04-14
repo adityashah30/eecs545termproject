@@ -13,7 +13,7 @@ class Classifier:
     which is again derived from the training set.
     '''
 
-    def __init__(self, hidden_net=[100]):
+    def __init__(self, hidden_net=31):
         self.hidden_net = hidden_net
         self.seed = 42
         self.nb_classes = 2
@@ -36,14 +36,13 @@ class Classifier:
         nb_features = X_train.shape[1]
 
         model = Sequential()
-        model.add(Dense(self.hidden_net[0], input_shape=(nb_features,)))
+        model.add(Dense(self.hidden_net, input_shape=(nb_features,)))
         model.add(Dropout(0.15))
         model.add(Activation('relu'))
-
-        for nb_nodes in self.hidden_net:
-            model.add(Dense(nb_nodes))
-            model.add(Dropout(0.15))
-            model.add(Activation('relu'))
+            
+        model.add(Dense(self.hidden_net))
+        model.add(Dropout(0.15))
+        model.add(Activation('relu'))
 
         model.add(Dense(1))
         model.add(Activation('sigmoid'))

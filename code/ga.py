@@ -8,7 +8,7 @@ class GA:
 
     def __init__(self, gen_count=10, size=10, elitism=0.15, mutation=0.3):
         self.gen_count = gen_count
-        self.population = Population(size, elitism, mutation)
+        self.population = Population.init_random(size, elitism, mutation)
 
     def search(self):
         for genIter in xrange(self.gen_count):
