@@ -18,7 +18,7 @@ class Classifier:
         self.seed = 42
         self.nb_classes = 2
         self.batch_size = 64
-        self.nb_epoch = 10
+        self.nb_epoch = 1
 
     def fit_score(self, data, feature_set):
         X, Y = data['X'][:,feature_set], data['Y']
@@ -31,28 +31,31 @@ class Classifier:
         X_test = scaler.transform(X_test)
         Y_train = np_utils.to_categorical(Y_train, self.nb_classes)
         Y_val = np_utils.to_categorical(Y_val, self.nb_classes)
-        Y_test = np_utils.to_categorical(Y_test, self.nb_classes)
+        Y_test_cat = np_utils.to_categorical(Y_test, self.nb_classes)
 
         nb_features = X_train.shape[1]
 
         model = Sequential()
         model.add(Dense(self.hidden_net, input_shape=(nb_features,)))
-        model.add(Dropout(0.15))
+        model.add(Dropout(0.2))
         model.add(Activation('relu'))
             
         model.add(Dense(self.hidden_net))
-        model.add(Dropout(0.15))
+        model.add(Dropout(0.2))
         model.add(Activation('relu'))
 
-        model.add(Dense(1))
-        model.add(Activation('sigmoid'))
+        model.add(Dense(self.nb_classes))
+        model.add(Activation('softmax'))
 
-        model.compile(class_mode='binary', loss='binary_crossentropy', optimizer='rmsprop')
+        # model.add(Dense(1))
+        # model.add(Activation('sigmoid'))
 
-        model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=0, validation_data=(X_val, Y_val))
+        model.compile(loss='binary_crossentropy', optimizer='rmsprop')
 
-        # test_score = model.evaluate(X_test, Y_test, verbose=0, batch_size=self.batch_size)
-        Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=0)
-        test_score = roc_auc_score(Y_test, Y_pred)
+        model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=1, validation_data=(X_val, Y_val))
+
+        test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
+        # Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=1)
+        # test_score = roc_auc_score(Y_test, Y_pred)
         print test_score
         return test_score

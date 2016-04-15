@@ -1,14 +1,7 @@
-"""
-Created on Tue Apr 12 21:27:18 2016
-@author: SHARATH NS
-"""
-
 from organism import Organism
-import random
-from operator import itemgetter
-import math
 import numpy as np
-
+from numpy.random import random
+from bisect import bisect
 
 class Population:
     '''
@@ -18,37 +11,32 @@ class Population:
     3. The mutation ratio
     '''
 
-    def __init__(self, size=10, elitism=0.15, mutation=0.3):
-        print size, elitism, mutation
+    def __init__(self, size=10, mutation=0.3):
+        Organism.mutation = mutation
         self.pop_size = size
-        self.elitism = elitism
         self.mutation = mutation
+        self.children_per_gen = self.pop_size/2
         self.population = []
 
+    def chooseParents(self):
+        cumulative_fitness = np.cumsum([org.fitness for org in self.population])
+        fitness_sum = cumulative_fitness[-1]
+        self.parents1 = sorted([self.population[bisect(cumulative_fitness, fitness_sum*random())] \
+          for _ in xrange(self.children_per_gen)], key=lambda org: org.fitness, reverse=True)
+        self.parents2 = sorted([self.population[bisect(cumulative_fitness, fitness_sum*random())] \
+          for _ in xrange(self.children_per_gen)], key=lambda org: org.fitness, reverse=True)
+
+    def reproduce(self):
+        self.children = [Organism.reproduce(p1, p2) for (p1, p2) in zip(self.parents1, self.parents2)]
+        self.population += self.children
+        self.population = sorted(self.population, key=lambda org: org.fitness, reverse=True)[:self.pop_size]
+
     def create_next_gen(self):
-        new_gen=Population(self.pop_size, self.elitism, self.mutation)
-        self.population = sorted(self.population, key=lambda a: a.fitness, reverse=True)
-        elite_pop_size = int(self.elitism*self.pop_size)
-        elite_population = self.population[:elite_pop_size]
-        new_population = []
-        for _ in xrange(self.pop_size):
-            parent1, parent2 = np.random.choice(self.population, 2, replace=False)
-            child1 = parent1.reproduce(parent2)
-            if np.random.random() <= self.mutation:
-                child1.mutate()
-            new_population.append(child1)
-            child2 = parent2.reproduce(parent1)
-            if np.random.random() <= self.mutation:
-                child2.mutate()
-            new_population.append(child2)
-        new_population = sorted(new_population, key=lambda a: a.fitness, reverse=True)
-        new_population = new_population[:self.pop_size-elite_pop_size]
-        new_population += elite_population
-        new_gen.population = new_population
-        return new_gen
+        self.chooseParents()
+        self.reproduce()
 
     @staticmethod
-    def init_random(size=10, elitism=0.15, mutation=0.3):
-        new_pop = Population(size, elitism, mutation)
-        new_pop.population = [Organism.init_random(15) for _ in range(size)]
+    def init_random(size=10, mutation=0.3):
+        new_pop = Population(size, mutation)
+        new_pop.population = [Organism.init_random(np.random.randint(5,32)) for _ in xrange(size)]
         return new_pop

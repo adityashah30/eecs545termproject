@@ -2,7 +2,6 @@ from classifier import Classifier
 import numpy as np
 from glob import glob
 
-
 def loadData():
     fileList = glob('../data/use_greedy_1/*.csv')
     data = np.concatenate([np.loadtxt(f, delimiter=',', skiprows=1) for f in fileList])
@@ -22,38 +21,38 @@ class Organism:
 
     data = loadData()
     count = 32  #number of features
+    mutation = 0.3
 
-    def __init__(self, feature_subset=[], hidden_nodes=None):
-        data = loadData()
+    def __init__(self, feature_subset=[1,2,3,4,5], hidden_nodes=10):
         self.feature_subset = feature_subset
         self.hidden_nodes = hidden_nodes
         self.fitness = self.fitness_measure()
-
-    def mutate(self):
-        subsetsize = len(self.feature_subset)
-        index = np.random.randint(0,subsetsize)
-        feature = np.random.randint(0,Organism.count)
-        while feature in self.feature_subset:
-            feature = np.random.randint(0,Organism.count)
-        self.feature_subset[index] = feature
-
-    def reproduce(self, other):
-        subsetsize1 = len(self.feature_subset)
-        subsetsize2 = len(other.feature_subset)
-        size = np.maximum(subsetsize1,subsetsize2)
-        crossoverpoint = np.random.randint(1,size-1)
-        childfeatures = np.concatenate((self.feature_subset[:crossoverpoint],other.feature_subset[crossoverpoint:]))
-        hiddennodes = np.random.randint(1,size-1)
-        child = Organism(childfeatures,hiddennodes)
-        return child
 
     def fitness_measure(self):
         classifier = Classifier(self.hidden_nodes)
         return classifier.fit_score(Organism.data, self.feature_subset)
 
     @staticmethod
-    def init_random(subsetsize):
-        hiddennodes = np.random.randint(1,Organism.count)
-        features = np.random.randint(0,Organism.count-1,size=subsetsize)
-        return Organism(features,hiddennodes)
+    def init_random(subset_size):
+        hidden_nodes = np.random.randint(subset_size+1, Organism.count)
+        features = np.random.randint(0, Organism.count-1, size=subset_size)
+        return Organism(features, hidden_nodes)
 
+    @staticmethod
+    def mutate(feature_subset):
+        if np.random.random() <= Organism.mutation:
+            new_feature = np.random.randint(0, Organism.count-1)
+            rand_idx = np.random.randint(0, feature_subset.shape[0]-1)
+            if new_feature not in feature_subset:
+                feature_subset[rand_idx] = new_feature
+        return feature_subset
+
+    @staticmethod
+    def reproduce(org1, org2):
+        size = min(org1.feature_subset.shape[0], org2.feature_subset.shape[0])
+        crossover_point = np.random.randint(1, size-1)
+        print crossover_point
+        new_features = np.concatenate(org1.feature_subset[:crossover_point], org2.feature_subset[crossover_point:])
+        new_features = Organism.mutate(new_features)
+        new_hidden_nodes = max(org1.hidden_nodes, org2.hidden_nodes)
+        return Organism(new_features, new_hidden_nodes)
