@@ -4,7 +4,7 @@ from sklearn.metrics import roc_auc_score
 from keras.models import Sequential
 from keras.utils import np_utils
 from keras.layers import Dense, Dropout, Activation
-from keras.optimizers import RMSprop
+from keras.optimizers import RMSprop, SGD
 
 class Classifier:
     '''
@@ -18,7 +18,7 @@ class Classifier:
         self.seed = 42
         self.nb_classes = 2
         self.batch_size = 64
-        self.nb_epoch = 1
+        self.nb_epoch = 20
 
     def fit_score(self, data, feature_set):
         X, Y = data['X'][:,feature_set], data['Y']
@@ -44,18 +44,20 @@ class Classifier:
         model.add(Dropout(0.2))
         model.add(Activation('relu'))
 
-        model.add(Dense(self.nb_classes))
-        model.add(Activation('softmax'))
+        # model.add(Dense(self.nb_classes))
+        # model.add(Activation('softmax'))
 
-        # model.add(Dense(1))
-        # model.add(Activation('sigmoid'))
+        model.add(Dense(1))
+        model.add(Activation('sigmoid'))
 
-        model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+        sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
+        model.compile(loss='binary_crossentropy', optimizer='rmsprop', class_mode='binary')
 
         model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=1, validation_data=(X_val, Y_val))
 
-        test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
-        # Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=1)
-        # test_score = roc_auc_score(Y_test, Y_pred)
+        # test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
+        Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=1)
+        test_score = roc_auc_score(Y_test, Y_pred)
         print test_score
         return test_score

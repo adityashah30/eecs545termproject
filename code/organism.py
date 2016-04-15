@@ -34,7 +34,7 @@ class Organism:
 
     @staticmethod
     def init_random(subset_size):
-        hidden_nodes = np.random.randint(subset_size+1, Organism.count)
+        hidden_nodes = np.random.randint(subset_size, Organism.count)
         features = np.random.randint(0, Organism.count-1, size=subset_size)
         return Organism(features, hidden_nodes)
 
@@ -49,10 +49,10 @@ class Organism:
 
     @staticmethod
     def reproduce(org1, org2):
-        size = min(org1.feature_subset.shape[0], org2.feature_subset.shape[0])
+        size = np.minimum(len(org1.feature_subset), len(org2.feature_subset))
         crossover_point = np.random.randint(1, size-1)
-        print crossover_point
-        new_features = np.concatenate(org1.feature_subset[:crossover_point], org2.feature_subset[crossover_point:])
+        new_features = np.concatenate((org1.feature_subset[:crossover_point], org2.feature_subset[crossover_point:]))
+        new_features = np.unique(new_features)
         new_features = Organism.mutate(new_features)
         new_hidden_nodes = max(org1.hidden_nodes, org2.hidden_nodes)
         return Organism(new_features, new_hidden_nodes)
