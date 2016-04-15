@@ -1,4 +1,4 @@
-from classifier import Classifier
+from classifier import classifier_factory
 import numpy as np
 from glob import glob
 
@@ -23,20 +23,21 @@ class Organism:
     count = 32  #number of features
     mutation = 0.3
 
-    def __init__(self, feature_subset=[1,2,3,4,5], hidden_nodes=10):
+    def __init__(self, feature_subset=[1,2,3,4,5], hidden_nodes=10, solve_method="logistic"):
         self.feature_subset = feature_subset
         self.hidden_nodes = hidden_nodes
+        self.solve_method = solve_method
         self.fitness = self.fitness_measure()
 
     def fitness_measure(self):
-        classifier = Classifier(self.hidden_nodes)
+        classifier = classifier_factory("logistic", self.hidden_nodes)
         return classifier.fit_score(Organism.data, self.feature_subset)
 
     @staticmethod
-    def init_random(subset_size):
+    def init_random(subset_size, solve_method="logistic"):
         hidden_nodes = np.random.randint(subset_size, Organism.count)
         features = np.random.randint(0, Organism.count-1, size=subset_size)
-        return Organism(features, hidden_nodes)
+        return Organism(features, hidden_nodes, solve_method)
 
     @staticmethod
     def mutate(feature_subset):
@@ -54,5 +55,5 @@ class Organism:
         new_features = np.concatenate((org1.feature_subset[:crossover_point], org2.feature_subset[crossover_point:]))
         new_features = np.unique(new_features)
         new_features = Organism.mutate(new_features)
-        new_hidden_nodes = max(org1.hidden_nodes, org2.hidden_nodes)
+        new_hidden_nodes = max(org1.hidden_nodes, org2.hidden_nodes, org1.solve_method)
         return Organism(new_features, new_hidden_nodes)
