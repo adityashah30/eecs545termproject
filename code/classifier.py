@@ -1,6 +1,8 @@
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import roc_auc_score
+from sklearn.cross_validation import cross_val_score
 from keras.models import Sequential
 from keras.utils import np_utils
 from keras.layers import Dense, Dropout, Activation
@@ -58,10 +60,10 @@ class NNKeras:
 
         model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=1, validation_data=(X_val, Y_val))
 
-        # test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
-        Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=1)
-        test_score = roc_auc_score(Y_test, Y_pred)
-        # print test_score
+        test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
+        # Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=1)
+        # test_score = roc_auc_score(Y_test, Y_pred)
+        print test_score
         return test_score
 
 class NNPybrain:
@@ -114,10 +116,10 @@ class NNPybrain:
 
         model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=1, validation_data=(X_val, Y_val))
 
-        # test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
-        Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=1)
-        test_score = roc_auc_score(Y_test, Y_pred)
-        # print test_score
+        test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
+        # Y_pred = model.predict_classes(X_test, batch_size=self.batch_size, verbose=1)
+        # test_score = roc_auc_score(Y_test, Y_pred)
+        print test_score
         return test_score
 
 class SVMClassifier:
@@ -159,8 +161,9 @@ class LogisitcRegClassifier:
         self.seed = 42
 
     def fit_score(self, data, feature_set):
+        # X_train, Y_train = data['X'][:,feature_set], data['Y']
         X, Y = data['X'][:,feature_set], data['Y']
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=self.seed)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=self.seed)
 
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
@@ -168,12 +171,18 @@ class LogisitcRegClassifier:
 
         nb_features = X_train.shape[1]
 
-        model = LogisticRegression(n_jobs=7)
-        model.fit(X_train, Y_train)
+        model = LogisticRegression(n_jobs=-1)
+
+        test_score = cross_val_score(model, X_train, Y_train, scoring='roc_auc', cv=10, n_jobs=7, verbose=0)
+        test_score = np.mean(test_score)
+        # model.fit(X_train, Y_train)
+        # print test_score
 
         Y_pred = model.predict(X_test)
         test_score = roc_auc_score(Y_test, Y_pred)
-        # print test_score
+
+        # test_score = model.score(X_test, Y_test)
+        print test_score
         return test_score
 
 

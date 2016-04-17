@@ -3,7 +3,7 @@ import numpy as np
 from glob import glob
 
 def loadData():
-    fileList = glob('../data/use_greedy_1/*.csv')
+    fileList = glob('../data/use_greedy_1/mylene.csv')
     data = np.concatenate([np.loadtxt(f, delimiter=',', skiprows=1) for f in fileList])
     X_data = data[:, :-1].astype('float32')
     Y_data = data[:, -1].astype('int8')
@@ -30,7 +30,7 @@ class Organism:
         self.fitness = self.fitness_measure()
 
     def fitness_measure(self):
-        classifier = classifier_factory("logistic", self.hidden_nodes)
+        classifier = classifier_factory(self.solve_method, self.hidden_nodes)
         return classifier.fit_score(Organism.data, self.feature_subset)
 
     @staticmethod
@@ -55,5 +55,5 @@ class Organism:
         new_features = np.concatenate((org1.feature_subset[:crossover_point], org2.feature_subset[crossover_point:]))
         new_features = np.unique(new_features)
         new_features = Organism.mutate(new_features)
-        new_hidden_nodes = max(org1.hidden_nodes, org2.hidden_nodes, org1.solve_method)
-        return Organism(new_features, new_hidden_nodes)
+        new_hidden_nodes = max(org1.hidden_nodes, org2.hidden_nodes)
+        return Organism(new_features, new_hidden_nodes, org1.solve_method)

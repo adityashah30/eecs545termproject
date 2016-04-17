@@ -1,4 +1,5 @@
 from population import Population
+from organism import Organism
 
 class GA:
     '''
@@ -22,5 +23,8 @@ class GA:
             print "In generation: ", genIter, "; Best fitness: ", best_fitness
         return self.population.population
 
-    def full_accuracy(self):
-        pass
+    @staticmethod
+    def full_accuracy(solve_method="logistic", hidden_nodes=50):
+        org = Organism(range(Organism.count), hidden_nodes, solve_method)
+        return org
+        
