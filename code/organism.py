@@ -26,7 +26,7 @@ class Organism:
     @staticmethod
     def init_random(subset_size, solve_method="logistic"):
         hidden_nodes = np.random.randint(subset_size, Organism.count)
-        features = np.random.randint(0, Organism.count-1, size=subset_size)
+        features = np.random.choice(range(Organism.count), size=subset_size, replace=False)
         return Organism(features, hidden_nodes, solve_method)
 
     @staticmethod

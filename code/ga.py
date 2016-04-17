@@ -19,7 +19,7 @@ class GA:
         return self.population.population
 
     @staticmethod
-    def full_accuracy(solve_method="logistic", hidden_nodes=50):
+    def full_accuracy(solve_method="logistic", hidden_nodes=45):
         org = Organism(range(Organism.count), hidden_nodes, solve_method)
         return org
         

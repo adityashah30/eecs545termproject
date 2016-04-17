@@ -45,11 +45,11 @@ class NNKeras:
 
         model = Sequential()
         model.add(Dense(self.hidden_net, input_shape=(nb_features,)))
-        model.add(Dropout(0.2))
+        # model.add(Dropout(0.2))
         model.add(Activation('sigmoid'))
             
         model.add(Dense(self.hidden_net))
-        model.add(Dropout(0.2))
+        # model.add(Dropout(0.2))
         model.add(Activation('sigmoid'))
 
         model.add(Dense(1))
@@ -239,10 +239,12 @@ def classifier_factory(solve_method="keras", hidden_nodes=10):
         return SVMClassifier()
     elif solve_method == "logistic":
         return LogisitcRegClassifier()
-    elif solve_method == "gaussiannb":
+    elif solve_method == "naivebayes":
         return GaussianNBClassifier()
     elif solve_method == "randomforest":
         return RFClassifier()
     elif solve_method == "lda":
         return LDAClassifier()
+    else:
+        return LogisitcRegClassifier()
     

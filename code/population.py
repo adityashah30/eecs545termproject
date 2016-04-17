@@ -38,5 +38,5 @@ class Population:
     @staticmethod
     def init_random(size=10, mutation=0.3, solve_method="logistic"):
         new_pop = Population(size, mutation)
-        new_pop.population = [Organism.init_random(np.random.randint(5,32), solve_method) for _ in xrange(size)]
+        new_pop.population = [Organism.init_random(np.random.randint(5, Organism.count), solve_method) for _ in xrange(size)]
         return new_pop

@@ -6,6 +6,7 @@ from glob import glob
 def loadData():
     fileList = glob('../data/datasets/*.csv')
     for f in fileList:
+        print "Loading file: ", f
         data = np.loadtxt(f, delimiter=',', skiprows=1)
         X_data = data[:, :-1].astype('float32')
         Y_data = data[:, -1].astype('float32')
@@ -14,12 +15,13 @@ def loadData():
         yield dataDict
 
 def main():
-    pop_size, gen_count, mutation = 10, 5, 0.3
+    pop_size, gen_count, mutation = 1, 1, 0.3
     solve_methods = ["keras", "pybrain", "svm", "logistic", "naivebayes", \
                      "randomforest", "lda"]
     for dataset in loadData():
         Organism.data = dataset
         Organism.count = dataset['X'].shape[1]
+        print Organism.count
         for solve_method in solve_methods:
             print "Using solve method: ", solve_method
             full_accuracy = GA.full_accuracy(solve_method)
