@@ -1,15 +1,5 @@
 from classifier import classifier_factory
 import numpy as np
-from glob import glob
-
-def loadData():
-    fileList = glob('../data/use_greedy_1/mylene.csv')
-    data = np.concatenate([np.loadtxt(f, delimiter=',', skiprows=1) for f in fileList])
-    X_data = data[:, :-1].astype('float32')
-    Y_data = data[:, -1].astype('int8')
-    Y_data[Y_data > 0] = 1
-    dataDict = {'X': X_data, 'Y': Y_data}
-    return dataDict
 
 class Organism:
     '''
@@ -19,8 +9,8 @@ class Organism:
                  nodes in the hidden layer.
     '''
 
-    data = loadData()
-    count = 32  #number of features
+    data = None
+    count = None  #number of features
     mutation = 0.3
 
     def __init__(self, feature_subset=[1,2,3,4,5], hidden_nodes=10, solve_method="logistic"):

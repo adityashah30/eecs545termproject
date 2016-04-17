@@ -12,14 +12,9 @@ class GA:
         self.population = Population.init_random(size, mutation, solve_method)
 
     def search(self):
-        ofile = "accuracy.txt"
-        fp = open(ofile, "w")
-        fp.close()
         for genIter in xrange(self.gen_count):
             self.population.create_next_gen()
             best_fitness = self.population.population[0].fitness
-            with open(ofile, "a") as fp:
-                fp.write(str(genIter)+", "+str(best_fitness)+"\n")
             print "In generation: ", genIter, "; Best fitness: ", best_fitness
         return self.population.population
 
