@@ -9,16 +9,17 @@ def loadData():
         print "Loading file: ", f
         data = np.loadtxt(f, delimiter=',', skiprows=1)
         X_data = data[:, :-1].astype('float32')
-        Y_data = data[:, -1].astype('float32')
+        Y_data = data[:, -1].astype('int8')
         Y_data[Y_data > 0] = 1
         dataDict = {'X': X_data, 'Y': Y_data, 'fname': f}
         yield dataDict
 
 def main():
-    pop_size, gen_count, mutation = 1, 1, 0.3
-    solve_methods = ["keras", "pybrain", "svm", "logistic", "naivebayes", \
-                     "randomforest", "lda"]
-    accuracy_fname = "accuracy.txt"
+    pop_size, gen_count, mutation = 10, 30, 0.4
+    #solve_methods = ["keras", "svm", "logistic", "naivebayes", \
+    #                "randomforest", "lda"]
+    solve_methods = ["keras"]
+    accuracy_fname = "accuracy_keras.txt"
     with open(accuracy_fname, "w") as fp:
         for dataset in loadData():
             fp.write("===================================\n")

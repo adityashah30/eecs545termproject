@@ -41,7 +41,10 @@ class Organism:
     @staticmethod
     def reproduce(org1, org2):
         size = np.minimum(len(org1.feature_subset), len(org2.feature_subset))
-        crossover_point = np.random.randint(1, size-1)
+        if(size-1 <= 1):
+            crossover_point = 0
+        else:
+            crossover_point = np.random.randint(1, size-1)
         new_features = np.concatenate((org1.feature_subset[:crossover_point], org2.feature_subset[crossover_point:]))
         new_features = np.unique(new_features)
         new_features = Organism.mutate(new_features)

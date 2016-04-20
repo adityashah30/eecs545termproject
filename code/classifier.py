@@ -24,8 +24,8 @@ class NNKeras:
         self.hidden_net = hidden_net
         self.seed = 42
         self.nb_classes = 2
-        self.batch_size = 64
-        self.nb_epoch = 20
+        self.batch_size = 32
+        self.nb_epoch = 100
 
     def fit_score(self, data, feature_set):
         X, Y = data['X'][:,feature_set], data['Y']
@@ -52,63 +52,17 @@ class NNKeras:
         # model.add(Dropout(0.2))
         model.add(Activation('sigmoid'))
 
-        model.add(Dense(1))
-        model.add(Activation('sigmoid'))
+        #model.add(Dense(1))
+        #model.add(Activation('sigmoid'))
 
-        model.compile(loss='binary_crossentropy', optimizer='adadelta', class_mode='binary')
+        model.add(Dense(self.nb_classes))
+        model.add(Activation('softmax'))
 
-        model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=1, validation_data=(X_val, Y_val))
+        model.compile(loss='binary_crossentropy', optimizer='adadelta')
 
-        test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
-        return test_score
-
-class NNPybrain:
-    '''
-    The NNPybrain class. Takes in a genotype and trains a classifier model
-    on a subset of the training set and returns evaluation score on test set
-    which is again derived from the training set.
-    '''
-
-    def __init__(self, hidden_net=31):
-        self.hidden_net = hidden_net
-        self.seed = 42
-        self.nb_classes = 2
-        self.batch_size = 64
-        self.nb_epoch = 20
-
-    def fit_score(self, data, feature_set):
-        X, Y = data['X'][:,feature_set], data['Y']
-
-        scaler = StandardScaler()
-        X = scaler.fit_transform(X)
-
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=self.seed)
-        X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, test_size=0.125, random_state=self.seed)
-
-        Y_train = np_utils.to_categorical(Y_train, self.nb_classes)
-        Y_val = np_utils.to_categorical(Y_val, self.nb_classes)
-        Y_test_cat = np_utils.to_categorical(Y_test, self.nb_classes)
-
-        nb_features = X_train.shape[1]
-
-        model = Sequential()
-        model.add(Dense(self.hidden_net, input_shape=(nb_features,)))
-        model.add(Dropout(0.2))
-        model.add(Activation('sigmoid'))
-            
-        model.add(Dense(self.hidden_net))
-        model.add(Dropout(0.2))
-        model.add(Activation('sigmoid'))
-
-        model.add(Dense(1))
-        model.add(Activation('sigmoid'))
-
-        model.compile(loss='binary_crossentropy', optimizer='adadelta', class_mode='binary')
-
-        model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, show_accuracy=True, verbose=1, validation_data=(X_val, Y_val))
+        model.fit(X_train, Y_train, batch_size=self.batch_size, nb_epoch=self.nb_epoch, verbose=0, validation_data=(X_val, Y_val))
 
         test_score = model.evaluate(X_test, Y_test_cat, verbose=0, batch_size=self.batch_size)
-        print test_score
         return test_score
 
 class SVMClassifier:
@@ -230,7 +184,6 @@ class LDAClassifier:
 
 def classifier_factory(solve_method="keras", hidden_nodes=10):
     solve_method = solve_method.lower()
-    print solve_method
     if solve_method == "keras":
         return NNKeras(hidden_nodes)
     elif solve_method == "pybrain":
